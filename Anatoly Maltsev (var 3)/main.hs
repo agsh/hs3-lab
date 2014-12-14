@@ -3,9 +3,6 @@ import System.Random
 data Tree a = Node a [Tree a] 
 	deriving (Show)
 
-checkMax a | a == [] = (-1)
-		   | otherwise = maximum a
-
 treeFold :: (a -> [t] -> t) -> Tree a -> t
 treeFold node = f 
 	where
@@ -15,9 +12,9 @@ height :: Tree a -> Integer
 height = treeFold node 
 	where
       node val subTrees = 1 + checkMax subTrees
-
-example :: Tree Integer
-example = Node 3 [Node 2 [], Node 5 [Node 2 [],Node 1 [Node 5 []]], Node 1 []]
+      	where
+      		checkMax a | a == [] = (-1)
+		   			   | otherwise = maximum a
 		
 buildRandomTree :: Int -> IO (Tree Int)
 buildRandomTree h = do
@@ -40,11 +37,6 @@ buildRandomTree h = do
 						where
 							inner f [] h acc = sequence acc
 							inner f (x:xs) h acc = inner f xs h ((f x h):acc)
-
-ioTreeOutput :: Show a => IO a -> IO ()
-ioTreeOutput ioTree = do
-	tree <- ioTree
-	putStrLn $ show tree
 
 randomInt :: Int -> IO (Int)
 randomInt n = randomRIO (1, n)
