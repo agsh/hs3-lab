@@ -7,7 +7,15 @@ data Tree a = Node a [Tree a]
 tree2List' level (Node val nodes) = (length nodes, level): concat (map (tree2List' (level+1)) nodes )
 tree2List node = tree2List' 0 node
 
-level tree = maximum $ tree2List tree 
+levels' list n acc
+	| isFinish 	== True = acc
+	| otherwise = levels' list (n - 1) ((sum [ fst x | x <- list, snd x == n] , n) : acc) 
+	where
+		isFinish = n < 0
+
+levels list = levels' list (maximum [snd x | x <- list]) []
+
+level tree = maximum $ levels $ tree2List tree
 
 buildRandomTree :: Int -> IO (Tree Int)
 buildRandomTree h = do
@@ -42,13 +50,16 @@ randomList n = do
 	return (num:list)
 
 
+test = Node 01 [Node 11  [Node 21 [Node 31 []], Node 22 [Node 31 [], Node 32 [], Node 33 [], Node 34 []]]]
+t = tree2List test
+
 main :: IO ()
 main = do
 	rndTree <- buildRandomTree 10
 	let testExamples = 
 		[
 			Node 01 [Node 11 [], Node 12 [], Node 13 [], Node 14 []],
-			Node 01 [Node 11  [Node 21  [Node 31 [], Node 32 [], Node 33 [], Node 34 []]]],
+			Node 01 [Node 11  [Node 31 [Node 31 []] , Node 21  [Node 31 [], Node 32 [], Node 33 [], Node 34 []]]],
 			rndTree
 		]
 	mapM_ 
